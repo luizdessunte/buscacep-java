@@ -8,22 +8,26 @@ import java.net.http.HttpResponse;
 
 public class ConsultaCEP {
     public Endereço buscaEndereço(String cep){
+        // Monta a URL no formato exigido pela API pública ViaCEP.
         URI endereço = URI.create("https://viacep.com.br/ws/" + cep + "/json/");
 
-        HttpClient client = HttpClient.newHttpClient();
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(endereço)
                 .build();
 
-        HttpResponse<String> response = null;
+
         try {
-            response = HttpClient
+            HttpResponse<String> response = HttpClient
                     .newHttpClient()
                     .send(request, HttpResponse.BodyHandlers.ofString());
+
+            // Converte o JSON de resposta diretamente para o record Endereço.
+            return new Gson().fromJson(response.body(), Endereço.class);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Erro ao buscar CEP");
         }
 
-        return new Gson().fromJson(response.body(), Endereço.class);
+
     }
 }
